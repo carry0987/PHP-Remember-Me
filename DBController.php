@@ -3,24 +3,24 @@ class DBController
 {
     private $host = 'localhost';
     private $user = 'root';
-    private $password = 'root';
+    private $password = '';
     private $database = 'db_auth';
     private $conn;
     
-    function __construct()
+    public function __construct()
     {
         $this->conn = $this->connectDB();
     }   
     
-    function connectDB()
+    public function connectDB()
     {
         $conn = mysqli_connect($this->host, $this->user, $this->password, $this->database);
         return $conn;
     }
     
-    function runBaseQuery($query)
+    public function runBaseQuery($query)
     {
-        $result = mysqli_query($this->conn,$query);
+        $result = mysqli_query($this->conn, $query);
         while ($row = mysqli_fetch_assoc($result)) {
             $resultset[] = $row;
         }
@@ -29,7 +29,7 @@ class DBController
         }
     }
 
-    function runQuery($query, $param_type, $param_value_array)
+    public function runQuery($query, $param_type, $param_value_array)
     {
         $sql = $this->conn->prepare($query);
         $this->bindQueryParams($sql, $param_type, $param_value_array);
@@ -45,7 +45,7 @@ class DBController
         }
     }
     
-    function bindQueryParams($sql, $param_type, $param_value_array)
+    public function bindQueryParams($sql, $param_type, $param_value_array)
     {
         $param_value_reference[] = & $param_type;
         for ($i=0; $i<count($param_value_array); $i++) {
@@ -54,14 +54,14 @@ class DBController
         call_user_func_array(array($sql, 'bind_param'), $param_value_reference);
     }
     
-    function insert($query, $param_type, $param_value_array)
+    public function insert($query, $param_type, $param_value_array)
     {
         $sql = $this->conn->prepare($query);
         $this->bindQueryParams($sql, $param_type, $param_value_array);
         $sql->execute();
     }
     
-    function update($query, $param_type, $param_value_array)
+    public function update($query, $param_type, $param_value_array)
     {
         $sql = $this->conn->prepare($query);
         $this->bindQueryParams($sql, $param_type, $param_value_array);
