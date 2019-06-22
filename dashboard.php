@@ -20,5 +20,5 @@ if (!$isLoggedIn) {
 }
 </style>
 <div class="member-dashboard">
-    <span>You have Successfully logged in!. <a href="logout.php">Logout</a></span>
+    <span>You have Successfully logged in ! <a href="logout.php">Logout</a></span>
 </div>
