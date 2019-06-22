@@ -18,28 +18,36 @@ class Auth
         return $result;
     }
 
-    public function getTokenByUsername($username, $expired)
+    public function getTokenByUsername($username)
     {
         $db_handle = DBController::getInstance();
-        $query = 'SELECT * FROM tbl_token_auth WHERE username = ? AND is_expired = ?';
-        $result = $db_handle->runQuery($query, 'si', array($username, $expired));
+        $query = 'SELECT * FROM tbl_token_auth WHERE username = ?';
+        $result = $db_handle->runQuery($query, 's', array($username));
         return $result;
     }
 
-    public function getTokenByUserID($userID, $expired)
+    public function getTokenByUserID($userID)
     {
         $db_handle = DBController::getInstance();
-        $query = 'SELECT * FROM tbl_token_auth WHERE user_id = ? AND is_expired = ?';
-        $result = $db_handle->runQuery($query, 'ii', array($userID, $expired));
+        $query = 'SELECT * FROM tbl_token_auth WHERE user_id = ?';
+        $result = $db_handle->runQuery($query, 'i', array($userID));
         return $result;
     }
 
-    public function markAsExpired($tokenId)
+    public function deleteToken($userID)
     {
         $db_handle = DBController::getInstance();
-        $query = 'UPDATE tbl_token_auth SET is_expired = ? WHERE id = ?';
-        $expired = 1;
-        $result = $db_handle->update($query, 'ii', array($expired, $tokenId));
+        $query = 'DELETE FROM tbl_token_auth WHERE user_id = ?';
+        $result = $db_handle->update($query, 'i', array($userID));
+        return $result;
+    }
+
+    public function updateToken($randomArray, $userID)
+    {
+        $db_handle = DBController::getInstance();
+        $query = 'UPDATE tbl_token_auth SET password_hash = ?, selector_hash = ?, expiry_date = ? WHERE user_id = ?';
+        $getTime = time() + (30 * 24 * 60 * 60);
+        $result = $db_handle->update($query, 'ssii', array($randomArray[0], $randomArray[1], $getTime, $userID));
         return $result;
     }
 

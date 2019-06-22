@@ -33,12 +33,14 @@ if (!empty($_POST['login'])) {
             $random_selector_hash = password_hash($random_selector, PASSWORD_DEFAULT);
             $expiry_date = $cookie_expiration_time;
             //Mark existing token as expired
-            $userToken = $auth->getTokenByUsername($username, 0);
-            if (!empty($userToken[0]['id'])) {
-                $auth->markAsExpired($userToken[0]['id']);
+            $userToken = $auth->getTokenByUsername($username);
+            if (!empty($userToken[0]['user_id'])) {
+                $updateRandom = array($random_password_hash , $random_selector_hash);
+                $auth->updateToken($updateRandom, $userToken[0]['user_id']);
+            } else {
+                //Insert new token
+                $auth->insertToken($user[0]['member_id'], $username, $random_password_hash, $random_selector_hash, $expiry_date);
             }
-            //Insert new token
-            $auth->insertToken($user[0]['member_id'], $username, $random_password_hash, $random_selector_hash, $expiry_date);
         } else {
             $util->clearAuthCookie();
         }
