@@ -1,6 +1,6 @@
 <?php 
-require_once dirname(__FILE__).'/class/Auth.php';
-require_once dirname(__FILE__).'/class/Util.php';
+require dirname(__FILE__).'/class/Auth.php';
+require dirname(__FILE__).'/class/Util.php';
 
 $auth = new Auth();
 $db_handle = DBController::getInstance();

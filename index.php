@@ -1,15 +1,12 @@
 <?php
 session_start();
 
-require dirname(__FILE__).'/class/Auth.php';
-require dirname(__FILE__).'/class/Util.php';
+require 'authCookieSessionValidate.php';
 
 $auth = new Auth();
 $db_handle = DBController::getInstance();
 $get_path = dirname($_SERVER['PHP_SELF']);
 $util = new Util($get_path);
-
-require 'authCookieSessionValidate.php';
 
 if ($isLoggedIn) {
     $util->redirect('dashboard.php');
@@ -118,7 +115,7 @@ body {
     <div class="field-group">
         <div>
             <input type="checkbox" name="remember" id="remember"
-                <?php if (isset($_COOKIE['member_login'])) { ?> checked
+                <?php if (isset($_COOKIE['member_login'])) { ?> checked="checked"
                 <?php } ?> /> <label for="remember-me">Remember me</label>
         </div>
     </div>
