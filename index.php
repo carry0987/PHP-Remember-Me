@@ -24,7 +24,7 @@ if (!empty($_POST['login'])) {
         $_SESSION['member_id'] = $user[0]['member_id'];
         //Set Auth Cookies if 'Remember Me' checked
         if (!empty($_POST['remember'])) {
-            $util->setCookie('member_login', $username, $cookie_expiration_time);
+            $util->setCookie('member_login', $user[0]['member_id'], $cookie_expiration_time);
             $random_password = $util->getToken(16);
             $util->setCookie('random_password', $random_password, $cookie_expiration_time);
             $random_selector = $util->getToken(32);
@@ -33,14 +33,12 @@ if (!empty($_POST['login'])) {
             $random_selector_hash = password_hash($random_selector, PASSWORD_DEFAULT);
             $expiry_date = $cookie_expiration_time;
             //Mark existing token as expired
-            $userToken = $auth->getTokenByUsername($username);
-            if (!empty($userToken[0]['user_id'])) {
-                $updateRandom = array($random_password_hash , $random_selector_hash);
-                $auth->updateToken($updateRandom, $userToken[0]['user_id']);
-            } else {
-                //Insert new token
-                $auth->insertToken($user[0]['member_id'], $username, $random_password_hash, $random_selector_hash, $expiry_date);
+            $userToken = $auth->getTokenByUserID($user[0]['member_id'], 0);
+            if (!empty($userToken[0]['id'])) {
+                $auth->markAsExpired($userToken[0]['id']);
             }
+            //Insert new token
+            $auth->insertToken($user[0]['member_id'], $random_password_hash, $random_selector_hash, $expiry_date);
         } else {
             $util->clearAuthCookie();
         }

@@ -15,9 +15,9 @@ INSERT INTO `members` (`member_id`, `member_name`, `member_password`, `member_em
 CREATE TABLE IF NOT EXISTS tbl_token_auth (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` int(8) UNSIGNED NOT NULL,
-  `username` varchar(255) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `selector_hash` varchar(255) NOT NULL,
+  `is_expired` tinyint(1) NOT NULL,
   `expiry_date` int(20) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX (`user_id`)
