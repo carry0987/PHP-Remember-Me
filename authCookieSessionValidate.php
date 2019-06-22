@@ -1,9 +1,9 @@
 <?php 
-require_once 'Auth.php';
-require_once 'Util.php';
+require_once dirname(__FILE__).'/class/Auth.php';
+require_once dirname(__FILE__).'/class/Util.php';
 
 $auth = new Auth();
-$db_handle = new DBController();
+$db_handle = DBController::getInstance();
 $get_path = dirname($_SERVER['PHP_SELF']);
 $util = new Util($get_path);
 
@@ -24,25 +24,25 @@ else if (!empty($_COOKIE['member_login']) && !empty($_COOKIE['random_password'])
     $isPasswordVerified = false;
     $isSelectorVerified = false;
     $isExpiryDateVerified = false;
-    
+
     //Get token for username
     $userToken = $auth->getTokenByUsername($_COOKIE['member_login'], 0);
-    
+
     //Validate random password cookie with database
     if (password_verify($_COOKIE['random_password'], $userToken[0]['password_hash'])) {
         $isPasswordVerified = true;
     }
-    
+
     //Validate random selector cookie with database
     if (password_verify($_COOKIE['random_selector'], $userToken[0]['selector_hash'])) {
         $isSelectorVerified = true;
     }
-    
+
     //Check cookie expiration by date
     if ($userToken[0]['expiry_date'] >= $current_time) {
         $isExpiryDareVerified = true;
     }
-    
+
     //Redirect if all cookie based validation retuens true
     //Else, mark the token as expired and clear cookies
     if (!empty($userToken[0]['id']) && $isPasswordVerified && $isSelectorVerified && $isExpiryDareVerified) {

@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require 'Util.php';
+require dirname(__FILE__).'/class/Util.php';
 $get_path = dirname($_SERVER['PHP_SELF']);
 $util = new Util($get_path);
 

@@ -20,7 +20,7 @@ class Util
         }
         return $token;
     }
-    
+
     public function cryptoRandSecure($min, $max)
     {
         $range = $max - $min;
@@ -42,13 +42,13 @@ class Util
         } while ($rnd >= $range);
         return $min + $rnd;
     }
-    
+
     public function redirect($url)
     {
         header('Location:'.$url);
         exit;
     }
-    
+
     public function clearAuthCookie()
     {
         if (isset($_COOKIE['member_login'])) {

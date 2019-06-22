@@ -6,13 +6,23 @@ class DBController
     private $password = '';
     private $database = 'db_auth';
     private $conn;
-    
-    public function __construct()
+    private static $instance = null;
+
+    //Get Instance
+    public static function getInstance()
+    {
+        if (!self::$instance instanceof self) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    private function __construct()
     {
         $this->conn = $this->connectDB();
-    }   
-    
-    public function connectDB()
+    }
+
+    private function connectDB()
     {
         $conn = mysqli_connect($this->host, $this->user, $this->password, $this->database);
         return $conn;

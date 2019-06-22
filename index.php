@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-require 'Auth.php';
-require 'Util.php';
+require dirname(__FILE__).'/class/Auth.php';
+require dirname(__FILE__).'/class/Util.php';
 
 $auth = new Auth();
-$db_handle = new DBController();
+$db_handle = DBController::getInstance();
 $get_path = dirname($_SERVER['PHP_SELF']);
 $util = new Util($get_path);
 
@@ -23,7 +23,6 @@ if (!empty($_POST['login'])) {
     if (password_verify($password, $user[0]['member_password'])) {
         $isAuthenticated = true;
     }
-    
     if ($isAuthenticated) {
         $_SESSION['member_id'] = $user[0]['member_id'];
         //Set Auth Cookies if 'Remember Me' checked
