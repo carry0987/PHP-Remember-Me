@@ -48,7 +48,7 @@ else if (!empty($_COOKIE['member_login']) && !empty($_COOKIE['random_password'])
         $isLoggedIn = true;
     } else {
         if (!empty($userToken[0]['user_id'])) {
-            $auth->deleteToken($userToken[0]['user_id']);
+            $auth->resetToken($userToken[0]['user_id']);
         }
         //Clear cookies
         $util->clearAuthCookie();

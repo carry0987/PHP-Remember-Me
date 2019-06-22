@@ -34,11 +34,11 @@ class Auth
         return $result;
     }
 
-    public function deleteToken($userID)
+    public function resetToken($userID)
     {
         $db_handle = DBController::getInstance();
-        $query = 'DELETE FROM tbl_token_auth WHERE user_id = ?';
-        $result = $db_handle->update($query, 'i', array($userID));
+        $query = 'UPDATE tbl_token_auth SET password_hash = ?, selector_hash = ?, expiry_date = ? WHERE user_id = ?';
+        $result = $db_handle->update($query, 'ssii', array('', '', 0, $userID));
         return $result;
     }
 
