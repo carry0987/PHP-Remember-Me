@@ -14,27 +14,22 @@ $cookie_expiration_time = $current_time + (30 * 24 * 60 * 60);
 $isLoggedIn = false;
 
 //Check if loggedin session and redirect if session exists
-if (!empty($_SESSION['member_id'])) {
+if (!empty($_SESSION['member_name'])) {
     $isLoggedIn = true;
 }
 //Check if loggedin session exists
-else if (!empty($_COOKIE['member_login']) && !empty($_COOKIE['random_password']) && !empty($_COOKIE['random_selector'])) {
+elseif (!empty($_COOKIE['member_login']) && !empty($_COOKIE['random_password']) && !empty($_COOKIE['random_selector'])) {
     //Initiate auth token verification diirective to false
     $isPasswordVerified = false;
-    $isSelectorVerified = false;
     $isExpiryDateVerified = false;
 
     //Get token for username
-    $userToken = $auth->getTokenByUsername($_COOKIE['member_login'], 0);
+    $selector = (isset($_COOKIE['random_selector'])) ? $_COOKIE['random_selector'] : 0;
+    $userToken = $auth->getTokenByUserID($_COOKIE['member_login'], $selector);
 
     //Validate random password cookie with database
     if (password_verify($_COOKIE['random_password'], $userToken[0]['password_hash'])) {
         $isPasswordVerified = true;
-    }
-
-    //Validate random selector cookie with database
-    if (password_verify($_COOKIE['random_selector'], $userToken[0]['selector_hash'])) {
-        $isSelectorVerified = true;
     }
 
     //Check cookie expiration by date
@@ -44,11 +39,11 @@ else if (!empty($_COOKIE['member_login']) && !empty($_COOKIE['random_password'])
 
     //Redirect if all cookie based validation retuens true
     //Else, mark the token as expired and clear cookies
-    if (!empty($userToken[0]['id']) && $isPasswordVerified && $isSelectorVerified && $isExpiryDareVerified) {
+    if ($userToken !== false && $isPasswordVerified && $isExpiryDareVerified) {
         $isLoggedIn = true;
     } else {
-        if (!empty($userToken[0]['id'])) {
-            $auth->markAsExpired($userToken[0]['id']);
+        if ($userToken !== false) {
+            $auth->markAsExpired($userToken[0]['selector_hash']);
         }
         //Clear cookies
         $util->clearAuthCookie();

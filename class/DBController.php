@@ -52,14 +52,16 @@ class DBController
         }
         if (!empty($resultset)) {
             return $resultset;
+        } else {
+            return false;
         }
     }
     
     public function bindQueryParams($sql, $param_type, $param_value_array)
     {
-        $param_value_reference[] = & $param_type;
+        $param_value_reference[] = &$param_type;
         for ($i=0; $i<count($param_value_array); $i++) {
-            $param_value_reference[] = & $param_value_array[$i];
+            $param_value_reference[] = &$param_value_array[$i];
         }
         call_user_func_array(array($sql, 'bind_param'), $param_value_reference);
     }

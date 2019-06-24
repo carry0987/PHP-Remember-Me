@@ -19,29 +19,38 @@ class Auth
         return $result;
     }
 
-    public function getTokenByUserID($userID, $expired)
+    public function getTokenByUserID($userID, $selector = 0)
     {
         $userID = (int) $userID;
         $db_handle = DBController::getInstance();
-        $query = 'SELECT * FROM tbl_token_auth INNER JOIN members ON member_id = user_id WHERE user_id = ? AND is_expired = ?';
-        $result = $db_handle->runQuery($query, 'ii', array($userID, $expired));
+        $query = 'SELECT * FROM tbl_token_auth INNER JOIN members ON member_id = user_id WHERE user_id = ? AND selector_hash = ?';
+        $result = $db_handle->runQuery($query, 'is', array($userID, $selector));
+        $tokenResult = ($result !== false) ? $result : false;
+        return $tokenResult;
+    }
+
+    public function markAsExpired($selector)
+    {
+        $db_handle = DBController::getInstance();
+        $query = 'UPDATE tbl_token_auth SET password_hash = ? WHERE selector_hash = ?';
+        $empty = 1;
+        $result = $db_handle->update($query, 'ss', array($empty, $selector));
         return $result;
     }
 
-    public function markAsExpired($tokenId)
+    public function updateToken($uid, $selector, $random_password_hash)
     {
         $db_handle = DBController::getInstance();
-        $query = 'UPDATE tbl_token_auth SET is_expired = ? WHERE id = ?';
-        $expired = 1;
-        $result = $db_handle->update($query, 'ii', array($expired, $tokenId));
+        $query = 'UPDATE tbl_token_auth SET password_hash = ? WHERE user_id = ? AND selector_hash = ?';
+        $result = $db_handle->insert($query, 'sis', array($random_password_hash, $uid, $selector));
         return $result;
     }
 
-    public function insertToken($uid, $random_password_hash, $random_selector_hash, $expiry_date)
+    public function insertToken($uid, $random_selector_hash, $random_password_hash, $expiry_date)
     {
         $db_handle = DBController::getInstance();
-        $query = 'INSERT INTO tbl_token_auth (user_id, password_hash, selector_hash, expiry_date) VALUES (?, ?, ?, ?)';
-        $result = $db_handle->insert($query, 'issi', array($uid, $random_password_hash, $random_selector_hash, $expiry_date));
+        $query = 'INSERT INTO tbl_token_auth (user_id, selector_hash, password_hash, expiry_date) VALUES (?, ?, ?, ?)';
+        $result = $db_handle->insert($query, 'issi', array($uid, $random_selector_hash, $random_password_hash, $expiry_date));
         return $result;
     }
 

@@ -51,14 +51,8 @@ class Util
 
     public function clearAuthCookie()
     {
-        if (isset($_COOKIE['member_login'])) {
-            $this->setCookie('member_login', '');
-        }
         if (isset($_COOKIE['random_password'])) {
-            $this->setCookie('random_password', '');
-        }
-        if (isset($_COOKIE['random_selector'])) {
-            $this->setCookie('random_selector', '');
+            $this->setCookie('random_password', 'none');
         }
     }
 
