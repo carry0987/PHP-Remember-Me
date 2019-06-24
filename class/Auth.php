@@ -32,9 +32,9 @@ class Auth
     public function markAsExpired($selector)
     {
         $db_handle = DBController::getInstance();
-        $query = 'UPDATE tbl_token_auth SET password_hash = ? WHERE selector_hash = ?';
+        $query = 'UPDATE tbl_token_auth SET password_hash = ?, expiry_date = ? WHERE selector_hash = ?';
         $empty = 1;
-        $result = $db_handle->update($query, 'ss', array($empty, $selector));
+        $result = $db_handle->update($query, 'sis', array($empty, $empty, $selector));
         return $result;
     }
 
