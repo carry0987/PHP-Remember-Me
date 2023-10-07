@@ -1,25 +1,26 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-CREATE TABLE IF NOT EXISTS members (
-  `member_id` int(8) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `member_name` varchar(255) NOT NULL,
-  `member_password` varchar(255) NOT NULL,
-  `member_email` varchar(255) NOT NULL,
-  PRIMARY KEY (`member_id`)
+/* Create user */
+CREATE TABLE IF NOT EXISTS `user` (
+  `uid` int(8) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` varchar(20) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `members` (`member_id`, `member_name`, `member_password`, `member_email`) VALUES
-(1, 'admin', '$2a$10$0FHEQ5/cplO3eEKillHvh.y009Wsf4WCKvQHsZntLamTUToIBe.fG', 'user@gmail.com');
+INSERT INTO `user` (`uid`, `username`, `password`) VALUES
+(1, 'admin', '$2a$10$0FHEQ5/cplO3eEKillHvh.y009Wsf4WCKvQHsZntLamTUToIBe.fG');
 
-CREATE TABLE IF NOT EXISTS tbl_token_auth (
-  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+/* Create remember me */
+CREATE TABLE IF NOT EXISTS `remember_me` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` int(8) UNSIGNED NOT NULL,
   `selector_hash` varchar(16) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `expiry_date` int(20) NOT NULL,
+  `pw_hash` varchar(255) NOT NULL,
+  `expiry_date` int(10) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE `tbl_token_auth` ADD CONSTRAINT `Token_User` FOREIGN KEY (`user_id`) REFERENCES `members`(`member_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `remember_me` ADD CONSTRAINT `Remember_User` FOREIGN KEY (`user_id`) REFERENCES `user`(`uid`) ON DELETE CASCADE ON UPDATE CASCADE;

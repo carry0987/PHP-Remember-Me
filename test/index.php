@@ -1,49 +1,71 @@
 <?php
+require 'config.php';
+require dirname(__DIR__).'/vendor/autoload.php';
+use carry0987\RememberMe\RememberMe as RememberMe;
+use carry0987\RememberMe\DBController as DBController;
+
+$get_path = dirname($_SERVER['PHP_SELF']);
+$rememberMe = new RememberMe($get_path);
+$db = new DBController;
+$db->connectDB(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+$rememberMe->getDB($db);
+$isLoggedIn = false;
+
 session_start();
 
-require 'authCookieSessionValidate.php';
-
-$auth = new Auth();
-$db_handle = DBController::getInstance();
-$get_path = dirname($_SERVER['PHP_SELF']);
-$util = new Util($get_path);
+//Check if loggedin session and redirect if session exists
+if (!empty($_SESSION['username'])) {
+    $isLoggedIn = true;
+}
+//Check if loggedin session exists
+elseif (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_pw']) && !empty($_COOKIE['random_selector'])) {
+    $checkRemember = $rememberMe->checkUserInfo($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
+    if ($checkRemember !== false) {
+        $_SESSION['username'] = $checkRemember['username'];
+        $isLoggedIn = true;
+    }
+}
 
 if ($isLoggedIn === true) {
-    $util->redirect('dashboard.php');
+    header('Location: dashboard.php');
+    exit();
 }
 
 if (!empty($_POST['login'])) {
     $isAuthenticated = false;
     $username = $_POST['member_name'];
     $password = $_POST['member_password'];
-    $user = $auth->getMemberByUsername($username);
-    if (password_verify($password, $user[0]['member_password'])) {
+    $user = $db->getUserByName($username);
+    if (password_verify($password, $user['password'])) {
         $isAuthenticated = true;
     }
     if ($isAuthenticated === true) {
-        $_SESSION['member_name'] = $username;
+        $_SESSION['username'] = $username;
+        //Set remember me
+        $cookie_expiration_time = time() + (30 * 24 * 60 * 60);
+        $year_time = time() + (1 * 365 * 24 * 3600);
         //Set Auth Cookies if 'Remember Me' checked
         if (!empty($_POST['remember'])) {
-            $util->setCookie('member_login', $user[0]['member_id'], $cookie_expiration_time);
-            $random_password = $util->getToken(16);
-            $util->setCookie('random_password', $random_password, $cookie_expiration_time);
-            $random_password_hash = password_hash($random_password, PASSWORD_DEFAULT);
+            $rememberMe->setCookie('user_login', $user['uid'], $year_time);
+            $random_password = $rememberMe->getToken(16);
+            $rememberMe->setCookie('random_pw', $random_password, $cookie_expiration_time);
+            $random_pw_hash = password_hash($random_password, PASSWORD_DEFAULT);
             $expiry_date = $cookie_expiration_time;
             $selector = (isset($_COOKIE['random_selector'])) ? $_COOKIE['random_selector'] : 0;
             //Mark existing token as expired
-            $userToken = $auth->getTokenByUserID($user[0]['member_id'], $selector);
+            $userToken = $db->getTokenByUserID($user['uid'], $selector);
             if ($userToken !== false) {
-                $auth->updateToken($user[0]['member_id'], $userToken[0]['selector_hash'], $random_password_hash);
+                $db->updateToken($user['uid'], $selector, $random_pw_hash);
             } else {
-                $random_selector = $util->getToken(16);
-                $util->setCookie('random_selector', $random_selector, $cookie_expiration_time);
+                $random_selector = $rememberMe->getToken(16);
+                $rememberMe->setCookie('random_selector', $random_selector, $year_time);
                 //Insert new token
-                $auth->insertToken($user[0]['member_id'], $random_selector, $random_password_hash, $expiry_date);
+                $db->insertToken($user['uid'], $random_selector, $random_pw_hash, $expiry_date);
             }
         } else {
-            $util->clearAuthCookie();
+            $rememberMe->clearAuthCookie();
         }
-        $util->redirect('dashboard.php');
+        header('Location: dashboard.php');
     } else {
         $message = 'Invalid Login';
     }
@@ -125,8 +147,7 @@ if (!empty($_POST['login'])) {
         </div>
         <div class="field-group">
             <div>
-                <input type="submit" name="login" value="Login"
-                    class="form-submit-button"></span>
+                <input type="submit" name="login" value="Login" class="form-submit-button"></span>
             </div>
         </div>
     </form>
