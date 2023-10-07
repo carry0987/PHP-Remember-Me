@@ -25,6 +25,7 @@ class DBController
     public function setConnection(\mysqli $connectDB)
     {
         $this->connectDB = $connectDB;
+        return $this;
     }
 
     public function getConnection()
