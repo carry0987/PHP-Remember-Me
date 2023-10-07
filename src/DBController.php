@@ -15,14 +15,13 @@ class DBController
             $this->connectDB = new \mysqli($host, $user, $password, $database, $port);
             $this->mysqli_version = $this->connectDB->server_info;
             $this->connectDB->set_charset('utf8mb4');
-            return $this->connectDB;
         } catch (\mysqli_sql_exception $e) {
             echo $this->throwDBError($e->getMessage(), $e->getCode());
             exit();
         }
     }
 
-    public function setConnection(\mysqli $connectDB)
+    public function setConnection($connectDB)
     {
         $this->connectDB = $connectDB;
         return $this;
