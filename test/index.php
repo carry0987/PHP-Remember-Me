@@ -36,6 +36,7 @@ if (!empty($_POST['login'])) {
     $username = $_POST['member_name'];
     $password = $_POST['member_password'];
     $user = $db->getUserByName($username);
+    $user = $user[0];
     if (password_verify($password, $user['password'])) {
         $isAuthenticated = true;
     }
@@ -127,7 +128,7 @@ if (!empty($_POST['login'])) {
                 <label for="login">Username</label>
             </div>
             <div>
-                <input name="member_name" type="text" value="" class="input-field">
+                <input name="member_name" type="text" value="" id="login" class="input-field">
             </div>
         </div>
         <div class="field-group">
@@ -135,14 +136,14 @@ if (!empty($_POST['login'])) {
                 <label for="password">Password</label>
             </div>
             <div>
-                <input name="member_password" type="password" value="" class="input-field">
+                <input name="member_password" id="password" type="password" value="" class="input-field">
             </div>
         </div>
         <div class="field-group">
             <div>
                 <input type="checkbox" name="remember" id="remember"
                     <?php if (isset($_COOKIE['member_login'])) { ?> checked="checked"
-                    <?php } ?> /> <label for="remember-me">Remember me</label>
+                    <?php } ?> /> <label for="remember">Remember me</label>
             </div>
         </div>
         <div class="field-group">

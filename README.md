@@ -6,3 +6,6 @@ Remember me with login via PHP, using Composer
 ```bash
 composer require carry0987/remember-me
 ```
+
+## Note
+The default test account is `admin:admin`  

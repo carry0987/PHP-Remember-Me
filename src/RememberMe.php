@@ -6,7 +6,7 @@ use carry0987\RememberMe\DBController as DBController;
 class RememberMe
 {
     private $path = '/';
-    protected $db;
+    protected $db = null;
 
     public function __construct(string $path)
     {

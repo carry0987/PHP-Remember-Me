@@ -1,5 +1,5 @@
 <?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASSWORD', '');
-define('DB_NAME', 'remember_me');
+define('DB_HOST', 'mariadb');
+define('DB_USER', 'test_user');
+define('DB_PASSWORD', 'test1234');
+define('DB_NAME', 'dev_remember');
