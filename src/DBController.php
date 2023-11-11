@@ -18,7 +18,7 @@ class DBController implements UserProviderInterface, TokenProviderInterface
         }
     }
 
-    public function setConnection($connectDB)
+    public function setConnection(PDO $connectDB)
     {
         $this->connectDB = $connectDB;
         return $this;
