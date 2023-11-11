@@ -1,21 +1,20 @@
 <?php
 namespace carry0987\RememberMe;
 
-use carry0987\RememberMe\DBController as DBController;
+use carry0987\RememberMe\Interfaces\UserProviderInterface;
+use carry0987\RememberMe\Interfaces\TokenProviderInterface;
 
 class RememberMe
 {
-    private $path = '/';
-    protected $db = null;
+    protected $userProvider;
+    protected $tokenProvider;
+    protected static $path;
 
-    public function __construct(string $path)
+    public function __construct(UserProviderInterface $userProvider, TokenProviderInterface $tokenProvider, string $path)
     {
-        $this->path = rtrim($path, '/');
-    }
-
-    public function getDB(DBController $db)
-    {
-        $this->db = $db;
+        $this->userProvider = $userProvider;
+        $this->tokenProvider = $tokenProvider;
+        self::$path = rtrim($path, '/');
     }
 
     public function checkUserInfo(int $userID, string $selector, string $randomPW)
@@ -26,7 +25,7 @@ class RememberMe
         $isPasswordVerified = false;
         $isExpiryDateVerified = false;
         //Get token for username
-        $userToken = $this->db->getTokenByUserID($userID, $selector);
+        $userToken = $this->tokenProvider->getTokenByUserID($userID, $selector);
         if ($userToken !== false) {
             //Validate random password cookie with database
             if (password_verify($randomPW, $userToken['pw_hash'])) {
@@ -43,13 +42,13 @@ class RememberMe
             $result = $userToken;
         } else {
             if ($userToken !== false) {
-                $this->db->resetToken($selector);
+                $this->tokenProvider->resetToken($selector);
                 //$result = $userToken;
             } else {
                 $result = false;
             }
             //Clear cookies
-            $this->clearAuthCookie();
+            $this->clearAuthCookie(self::$path);
         }
         return $result;
     }
@@ -67,17 +66,18 @@ class RememberMe
         return $token;
     }
 
-    public function clearAuthCookie()
+    public static function clearAuthCookie(string $path = null)
     {
         if (isset($_COOKIE['random_pw'])) {
-            $this->setCookie('random_pw', 'none');
+            self::$path = $path;
+            self::setCookie('random_pw', 'none');
         }
     }
 
-    public function setCookie(string $cookieName, $value, int $cookieTime = 0)
+    public static function setCookie(string $cookieName, $value, int $cookieTime = 0)
     {
         $domain = (string) null;
-        return setcookie($cookieName, $value, $cookieTime, $this->path.'/', $domain, true, true);
+        return setcookie($cookieName, $value, $cookieTime, self::$path.'/', $domain, true, true);
     }
 
     private static function cryptoRandSecure(int $min, int $max)

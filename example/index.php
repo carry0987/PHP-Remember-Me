@@ -5,20 +5,19 @@ use carry0987\RememberMe\RememberMe as RememberMe;
 use carry0987\RememberMe\DBController as DBController;
 
 $get_path = dirname($_SERVER['PHP_SELF']);
-$rememberMe = new RememberMe($get_path);
+
 $db = new DBController;
 $db->connectDB(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-$rememberMe->getDB($db);
-$isLoggedIn = false;
+// Inject DBController instance to RememberMe
+$rememberMe = new RememberMe($db, $db, $get_path);
 
+$isLoggedIn = false;
 session_start();
 
-//Check if loggedin session and redirect if session exists
+// Check if logged in session and redirect if session exists
 if (!empty($_SESSION['username'])) {
     $isLoggedIn = true;
-}
-//Check if loggedin session exists
-elseif (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_pw']) && !empty($_COOKIE['random_selector'])) {
+} elseif (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_pw']) && !empty($_COOKIE['random_selector'])) {
     $checkRemember = $rememberMe->checkUserInfo($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
     if ($checkRemember !== false) {
         $_SESSION['username'] = $checkRemember['username'];
@@ -64,7 +63,7 @@ if (!empty($_POST['login'])) {
                 $db->insertToken($user['uid'], $random_selector, $random_pw_hash, $expiry_date);
             }
         } else {
-            $rememberMe->clearAuthCookie();
+            $rememberMe->clearAuthCookie($get_path);
         }
         header('Location: dashboard.php');
     } else {

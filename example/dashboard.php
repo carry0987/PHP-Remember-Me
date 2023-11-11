@@ -5,7 +5,9 @@ use carry0987\RememberMe\RememberMe as RememberMe;
 use carry0987\RememberMe\DBController as DBController;
 
 $get_path = dirname($_SERVER['PHP_SELF']);
-$rememberMe = new RememberMe($get_path);
+$db = new DBController;
+$db->connectDB(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+$rememberMe = new RememberMe($db, $db, $get_path);
 $isLoggedIn = false;
 
 session_start();
@@ -16,9 +18,6 @@ if (!empty($_SESSION['username'])) {
 }
 //Check if loggedin session exists
 elseif (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_pw']) && !empty($_COOKIE['random_selector'])) {
-    $db = new DBController();
-    $db->connectDB(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-    $rememberMe->getDB($db);
     $checkRemember = $rememberMe->checkUserInfo($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
     if ($checkRemember !== false) {
         $_SESSION['username'] = $checkRemember['username'];
