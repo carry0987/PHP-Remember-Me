@@ -68,23 +68,23 @@ class DBController implements DatabaseInterface
         }
     }
 
-    public function updateToken(int $userID, string $selector, string $pw_hash)
+    public function updateToken(int $userID, string $selector, string $tokenHash)
     {
         $query = $this->connectDB->prepare('UPDATE remember_me SET pw_hash = ?, expiry_date = ? WHERE user_id = ? AND selector_hash = ?');
         $getTime = time() + (30 * 24 * 60 * 60);
         try {
-            $query->execute([$pw_hash, $getTime, $userID, $selector]);
+            $query->execute([$tokenHash, $getTime, $userID, $selector]);
             return true;
         } catch (\PDOException $e) {
             self::throwDBError($e->getMessage(), $e->getCode());
         }
     }
 
-    public function insertToken(int $userID, string $selector, string $random_pw_hash, int $expiry_date = 0)
+    public function insertToken(int $userID, string $selector, string $tokenHash, int $expiryDate = 0)
     {
         $query = $this->connectDB->prepare('INSERT INTO remember_me (user_id, selector_hash, pw_hash, expiry_date) VALUES (?, ?, ?, ?)');
         try {
-            $query->execute([$userID, $selector, $random_pw_hash, $expiry_date]);
+            $query->execute([$userID, $selector, $tokenHash, $expiryDate]);
             return true;
         } catch (\PDOException $e) {
             self::throwDBError($e->getMessage(), $e->getCode());
