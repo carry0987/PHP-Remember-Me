@@ -12,8 +12,7 @@ class DBController
         try {
             $this->connectDB = new PDO("mysql:host=$host;dbname=$database;port=$port;charset=utf8mb4", $user, $password);
         } catch (\PDOException $e) {
-            echo $this->throwDBError($e->getMessage(), $e->getCode());
-            exit();
+            self::throwDBError($e->getMessage(), $e->getCode());
         }
     }
 
@@ -37,8 +36,7 @@ class DBController
             $results = $query->fetchAll(PDO::FETCH_ASSOC);
             return (!empty($results)) ? $results : false;
         } catch (\PDOException $e) {
-            echo self::throwDBError($e->getMessage(), $e->getCode());
-            return false;
+            self::throwDBError($e->getMessage(), $e->getCode());
         }
     }
 
@@ -52,8 +50,7 @@ class DBController
             $results = $query->fetch(PDO::FETCH_ASSOC);
             return (!empty($results)) ? $results : false;
         } catch (\PDOException $e) {
-            echo self::throwDBError($e->getMessage(), $e->getCode());
-            return false;
+            self::throwDBError($e->getMessage(), $e->getCode());
         }
     }
 
@@ -66,8 +63,7 @@ class DBController
             $query->execute([$empty, $date, $selector]);
             return true;
         } catch (\PDOException $e) {
-            echo self::throwDBError($e->getMessage(), $e->getCode());
-            return false;
+            self::throwDBError($e->getMessage(), $e->getCode());
         }
     }
 
@@ -79,8 +75,7 @@ class DBController
             $query->execute([$pw_hash, $getTime, $userID, $selector]);
             return true;
         } catch (\PDOException $e) {
-            echo self::throwDBError($e->getMessage(), $e->getCode());
-            return false;
+            self::throwDBError($e->getMessage(), $e->getCode());
         }
     }
 
@@ -91,8 +86,7 @@ class DBController
             $query->execute([$userID, $selector, $random_pw_hash, $expiry_date]);
             return true;
         } catch (\PDOException $e) {
-            echo self::throwDBError($e->getMessage(), $e->getCode());
-            return false;
+            self::throwDBError($e->getMessage(), $e->getCode());
         }
     }
 
@@ -101,6 +95,7 @@ class DBController
         $error = '<h1>Service unavailable</h1>'."\n";
         $error .= '<h2>Error Info :'.$message.'</h2>'."\n";
         $error .= '<h3>Error Code :'.$code.'</h3>'."\n";
-        return $error;
+
+        throw new \PDOException($error);
     }
 }

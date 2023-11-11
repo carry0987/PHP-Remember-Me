@@ -34,12 +34,12 @@ class RememberMe
             }
             //Check cookie expiration by date
             if ($userToken['expiry_date'] >= $current_time) {
-                $isExpiryDareVerified = true;
+                $isExpiryDateVerified = true;
             }
         }
         //Redirect if all cookie based validation retuens true
         //Else, mark the token as expired and clear cookies
-        if ($userToken !== false && $isPasswordVerified === true && $isExpiryDareVerified === true) {
+        if ($userToken !== false && $isPasswordVerified === true && $isExpiryDateVerified === true) {
             $result = $userToken;
         } else {
             if ($userToken !== false) {
