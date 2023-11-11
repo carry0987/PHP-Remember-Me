@@ -1,15 +1,19 @@
 <?php
-require 'config.php';
 require dirname(__DIR__).'/vendor/autoload.php';
+require 'config.php';
 use carry0987\RememberMe\RememberMe as RememberMe;
-use carry0987\RememberMe\DBController as DBController;
+// Just for example
+use carry0987\RememberMe\Example\DBController;
+use carry0987\RememberMe\Example\CookieHandler;
 
 $get_path = dirname($_SERVER['PHP_SELF']);
 
 $db = new DBController;
 $db->connectDB(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+$cookieHandler = new CookieHandler;
+$cookieHandler->setPath($get_path);
 // Inject DBController instance to RememberMe
-$rememberMe = new RememberMe($db, $get_path);
+$rememberMe = new RememberMe($db, $cookieHandler);
 
 $isLoggedIn = false;
 session_start();
@@ -18,8 +22,9 @@ session_start();
 if (!empty($_SESSION['username'])) {
     $isLoggedIn = true;
 } elseif (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_pw']) && !empty($_COOKIE['random_selector'])) {
-    $checkRemember = $rememberMe->checkUserInfo($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
+    $checkRemember = $rememberMe->verifyToken($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
     if ($checkRemember !== false) {
+        $checkRemember = $db->getUserInfo((int) $_COOKIE['user_login']);
         $_SESSION['username'] = $checkRemember['username'];
         $isLoggedIn = true;
     }
@@ -46,9 +51,9 @@ if (!empty($_POST['login'])) {
         $year_time = time() + (1 * 365 * 24 * 3600);
         //Set Auth Cookies if 'Remember Me' checked
         if (!empty($_POST['remember'])) {
-            $rememberMe->setCookie('user_login', $user['uid'], $year_time);
+            $cookieHandler->setAuthCookie('user_login', $user['uid'], $year_time);
             $random_password = $rememberMe->getToken(16);
-            $rememberMe->setCookie('random_pw', $random_password, $cookie_expiration_time);
+            $cookieHandler->setAuthCookie('random_pw', $random_password, $cookie_expiration_time);
             $random_pw_hash = password_hash($random_password, PASSWORD_DEFAULT);
             $expiry_date = $cookie_expiration_time;
             $selector = (isset($_COOKIE['random_selector'])) ? $_COOKIE['random_selector'] : 0;
@@ -58,12 +63,12 @@ if (!empty($_POST['login'])) {
                 $db->updateToken($user['uid'], $selector, $random_pw_hash);
             } else {
                 $random_selector = $rememberMe->getToken(16);
-                $rememberMe->setCookie('random_selector', $random_selector, $year_time);
+                $cookieHandler->setAuthCookie('random_selector', $random_selector, $year_time);
                 //Insert new token
                 $db->insertToken($user['uid'], $random_selector, $random_pw_hash, $expiry_date);
             }
         } else {
-            $rememberMe->clearAuthCookie($get_path);
+            $cookieHandler->clearAuthCookie($get_path);
         }
         header('Location: dashboard.php');
     } else {

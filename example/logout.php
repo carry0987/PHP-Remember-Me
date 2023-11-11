@@ -1,17 +1,18 @@
 <?php
 require dirname(__DIR__).'/vendor/autoload.php';
-use carry0987\RememberMe\RememberMe as RememberMe;
+// Just for example
+use carry0987\RememberMe\Example\CookieHandler;
 
 session_start();
 $get_path = dirname($_SERVER['PHP_SELF']);
 
 //Clear Session
-unset($_SESSION['member_id']);
-unset($_SESSION['member_name']);
+unset($_SESSION['username']);
 session_unset();
 session_destroy();
 
 //Clear cookies
-RememberMe::clearAuthCookie($get_path);
+CookieHandler::setPath($get_path);
+CookieHandler::clearAuthCookie();
 
 header('Location: ./');

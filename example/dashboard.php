@@ -1,13 +1,17 @@
 <?php
-require 'config.php';
 require dirname(__DIR__).'/vendor/autoload.php';
+require 'config.php';
 use carry0987\RememberMe\RememberMe as RememberMe;
-use carry0987\RememberMe\DBController as DBController;
+// Just for example
+use carry0987\RememberMe\Example\DBController as DBController;
+use carry0987\RememberMe\Example\CookieHandler as CookieHandler;
 
 $get_path = dirname($_SERVER['PHP_SELF']);
 $db = new DBController;
 $db->connectDB(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-$rememberMe = new RememberMe($db, $get_path);
+$cookieHandler = new CookieHandler;
+$cookieHandler->setPath($get_path);
+$rememberMe = new RememberMe($db, $cookieHandler);
 $isLoggedIn = false;
 
 session_start();
@@ -18,7 +22,7 @@ if (!empty($_SESSION['username'])) {
 }
 //Check if loggedin session exists
 elseif (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_pw']) && !empty($_COOKIE['random_selector'])) {
-    $checkRemember = $rememberMe->checkUserInfo($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
+    $checkRemember = $rememberMe->verifyToken($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
     if ($checkRemember !== false) {
         $_SESSION['username'] = $checkRemember['username'];
         $isLoggedIn = true;

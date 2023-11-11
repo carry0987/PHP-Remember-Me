@@ -14,6 +14,11 @@
             "carry0987\\RememberMe\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "carry0987\\RememberMe\\Example\\": "example/class/"
+        }
+    },
     "authors": [
         {
             "name": "carry0987"
