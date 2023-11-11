@@ -43,9 +43,7 @@ class DBController implements DatabaseInterface
 
     public function getTokenByUserID(int $userID, string $selector)
     {
-        $query = $this->connectDB->prepare('SELECT pw_hash, expiry_date, user.username FROM remember_me 
-                INNER JOIN user ON user.uid = remember_me.user_id 
-                WHERE user_id = ? AND selector_hash = ?');
+        $query = $this->connectDB->prepare('SELECT pw_hash, expiry_date FROM remember_me WHERE user_id = ? AND selector_hash = ?');
         try {
             $query->execute([$userID, $selector]);
             $results = $query->fetch(PDO::FETCH_ASSOC);
