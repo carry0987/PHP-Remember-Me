@@ -7,7 +7,7 @@ use carry0987\RememberMe\DBController as DBController;
 $get_path = dirname($_SERVER['PHP_SELF']);
 $db = new DBController;
 $db->connectDB(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-$rememberMe = new RememberMe($db, $db, $get_path);
+$rememberMe = new RememberMe($db, $get_path);
 $isLoggedIn = false;
 
 session_start();

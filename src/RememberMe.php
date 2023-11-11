@@ -1,19 +1,16 @@
 <?php
 namespace carry0987\RememberMe;
 
-use carry0987\RememberMe\Interfaces\UserProviderInterface;
-use carry0987\RememberMe\Interfaces\TokenProviderInterface;
+use carry0987\RememberMe\Interfaces\DatabaseInterface;
 
 class RememberMe
 {
-    protected $userProvider;
-    protected $tokenProvider;
+    protected $databaseProvider;
     protected static $path;
 
-    public function __construct(UserProviderInterface $userProvider, TokenProviderInterface $tokenProvider, string $path)
+    public function __construct(DatabaseInterface $databaseProvider, string $path)
     {
-        $this->userProvider = $userProvider;
-        $this->tokenProvider = $tokenProvider;
+        $this->databaseProvider = $databaseProvider;
         self::$path = rtrim($path, '/');
     }
 

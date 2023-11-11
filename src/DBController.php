@@ -1,11 +1,10 @@
 <?php
 namespace carry0987\RememberMe;
 
-use carry0987\RememberMe\Interfaces\UserProviderInterface;
-use carry0987\RememberMe\Interfaces\TokenProviderInterface;
+use carry0987\RememberMe\Interfaces\DatabaseInterface;
 use PDO;
 
-class DBController implements UserProviderInterface, TokenProviderInterface
+class DBController implements DatabaseInterface
 {
     private $connectDB = null;
 

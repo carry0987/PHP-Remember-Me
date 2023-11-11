@@ -1,7 +1,7 @@
 <?php
 namespace carry0987\RememberMe\Interfaces;
 
-interface TokenProviderInterface {
+interface DatabaseInterface {
     public function getTokenByUserID(int $userID, string $selector);
     public function resetToken(string $selector);
     public function updateToken(int $userID, string $selector, string $pw_hash);
