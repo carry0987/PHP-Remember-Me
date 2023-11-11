@@ -22,7 +22,7 @@ class RememberMe
         $isPasswordVerified = false;
         $isExpiryDateVerified = false;
         //Get token for username
-        $userToken = $this->tokenProvider->getTokenByUserID($userID, $selector);
+        $userToken = $this->databaseProvider->getTokenByUserID($userID, $selector);
         if ($userToken !== false) {
             //Validate random password cookie with database
             if (password_verify($randomPW, $userToken['pw_hash'])) {
@@ -39,7 +39,7 @@ class RememberMe
             $result = $userToken;
         } else {
             if ($userToken !== false) {
-                $this->tokenProvider->resetToken($selector);
+                $this->databaseProvider->resetToken($selector);
                 //$result = $userToken;
             } else {
                 $result = false;
