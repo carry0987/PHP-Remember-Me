@@ -23,7 +23,7 @@ if (!empty($_SESSION['username'])) {
 //Check if loggedin session exists
 elseif (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_pw']) && !empty($_COOKIE['random_selector'])) {
     $checkRemember = $rememberMe->verifyToken($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
-    if ($checkRemember !== false) {
+    if (!empty($checkRemember)) {
         $_SESSION['username'] = $checkRemember['username'];
         $isLoggedIn = true;
     }

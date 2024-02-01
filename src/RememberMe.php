@@ -15,16 +15,16 @@ class RememberMe
         $this->cookieHandler = $cookieHandler;
     }
 
-    public function verifyToken(int $userID, string $selector, string $randomPW)
+    public function verifyToken(int $userID, string $selector, string $randomPW): array
     {
         $current_time = time();
-        $result = false;
+        $result = [];
         //Initiate auth token verification directive to false
         $isPasswordVerified = false;
         $isExpiryDateVerified = false;
         //Get token for username
         $userToken = $this->tokenRepository->getTokenByUserID($userID, $selector);
-        if ($userToken !== false) {
+        if (!empty($userToken)) {
             //Validate random password cookie with database
             if (password_verify($randomPW, $userToken['pw_hash'])) {
                 $isPasswordVerified = true;
@@ -36,13 +36,13 @@ class RememberMe
         }
         //Redirect if all cookie based validation retuens true
         //Else, mark the token as expired and clear cookies
-        if ($userToken !== false && $isPasswordVerified === true && $isExpiryDateVerified === true) {
+        if (!empty($userToken) && $isPasswordVerified === true && $isExpiryDateVerified === true) {
             $result = $userToken;
         } else {
-            if ($userToken !== false) {
+            if (!empty($userToken)) {
                 $this->tokenRepository->invalidateToken($selector);
             } else {
-                $result = false;
+                $result = [];
             }
             //Clear cookies
             $this->cookieHandler->clearAuthCookie();
@@ -51,7 +51,7 @@ class RememberMe
         return $result;
     }
 
-    public static function getToken(int $length)
+    public static function getToken(int $length): string
     {
         $token = '';
         $codeAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -65,7 +65,7 @@ class RememberMe
         return $token;
     }
 
-    private static function cryptoRandSecure(int $min, int $max)
+    private static function cryptoRandSecure(int $min, int $max): int
     {
         $range = $max - $min;
         if ($range < 1) {

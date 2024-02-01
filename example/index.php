@@ -23,7 +23,7 @@ if (!empty($_SESSION['username'])) {
     $isLoggedIn = true;
 } elseif (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_pw']) && !empty($_COOKIE['random_selector'])) {
     $checkRemember = $rememberMe->verifyToken($_COOKIE['user_login'], $_COOKIE['random_selector'], $_COOKIE['random_pw']);
-    if ($checkRemember !== false) {
+    if (!empty($checkRemember)) {
         $checkRemember = $db->getUserInfo((int) $_COOKIE['user_login']);
         $_SESSION['username'] = $checkRemember['username'];
         $isLoggedIn = true;
@@ -59,7 +59,7 @@ if (!empty($_POST['login'])) {
             $selector = (isset($_COOKIE['random_selector'])) ? $_COOKIE['random_selector'] : 0;
             //Mark existing token as expired
             $userToken = $db->getTokenByUserID($user['uid'], $selector);
-            if ($userToken !== false) {
+            if (!empty($userToken)) {
                 $db->updateToken($user['uid'], $selector, $random_pw_hash);
             } else {
                 $random_selector = $rememberMe->getToken(16);

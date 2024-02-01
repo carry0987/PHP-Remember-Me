@@ -17,18 +17,19 @@ class DBController implements TokenRepositoryInterface
         }
     }
 
-    public function setConnection(PDO $connectDB)
+    public function setConnection(PDO $connectDB): self
     {
         $this->pdo = $connectDB;
+
         return $this;
     }
 
-    public function getConnection()
+    public function getConnection(): PDO
     {
         return $this->pdo;
     }
 
-    public function getTokenByUserID($userID, $selector)
+    public function getTokenByUserID(int $userID, string $selector)
     {
         $stmt = $this->pdo->prepare('SELECT pw_hash, expiry_date FROM remember_me WHERE user_id = :user_id AND selector_hash = :selector');
         $stmt->bindParam(':user_id', $userID, PDO::PARAM_INT);
@@ -38,7 +39,7 @@ class DBController implements TokenRepositoryInterface
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function invalidateToken($selector)
+    public function invalidateToken($selector): bool
     {
         $stmt = $this->pdo->prepare('UPDATE remember_me SET pw_hash = :pw_hash, expiry_date = 0 WHERE selector_hash = :selector');
         $stmt->bindValue(':pw_hash', '', PDO::PARAM_STR);
@@ -47,7 +48,7 @@ class DBController implements TokenRepositoryInterface
         return $stmt->execute();
     }
 
-    public function getUserInfo(int $userID)
+    public function getUserInfo(int $userID): array
     {
         $stmt = $this->pdo->prepare('SELECT username FROM user WHERE uid = :user_id');
         $stmt->bindParam(':user_id', $userID, PDO::PARAM_INT);
@@ -56,20 +57,20 @@ class DBController implements TokenRepositoryInterface
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getUserByName(string $username)
+    public function getUserByName(string $username): array
     {
-        $results = array();
+        $results = [];
         $query = $this->pdo->prepare('SELECT uid, password FROM user WHERE username = ?');
         try {
             $query->execute([$username]);
             $results = $query->fetchAll(PDO::FETCH_ASSOC);
-            return (!empty($results)) ? $results : false;
+            return $results;
         } catch (\PDOException $e) {
             self::throwDBError($e->getMessage(), $e->getCode());
         }
     }
 
-    public function updateToken(int $userID, string $selector, string $tokenHash)
+    public function updateToken(int $userID, string $selector, string $tokenHash): bool
     {
         $query = $this->pdo->prepare('UPDATE remember_me SET pw_hash = ?, expiry_date = ? WHERE user_id = ? AND selector_hash = ?');
         $getTime = time() + (30 * 24 * 60 * 60);
@@ -81,7 +82,7 @@ class DBController implements TokenRepositoryInterface
         }
     }
 
-    public function insertToken(int $userID, string $selector, string $tokenHash, int $expiryDate = 0)
+    public function insertToken(int $userID, string $selector, string $tokenHash, int $expiryDate = 0): bool
     {
         $query = $this->pdo->prepare('INSERT INTO remember_me (user_id, selector_hash, pw_hash, expiry_date) VALUES (?, ?, ?, ?)');
         try {
