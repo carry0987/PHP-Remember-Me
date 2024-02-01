@@ -41,13 +41,13 @@ class RememberMe
         } else {
             if ($userToken !== false) {
                 $this->tokenRepository->invalidateToken($selector);
-                //$result = $userToken;
             } else {
                 $result = false;
             }
             //Clear cookies
             $this->cookieHandler->clearAuthCookie();
         }
+
         return $result;
     }
 
@@ -61,6 +61,7 @@ class RememberMe
         for ($i = 0; $i < $length; $i ++) {
             $token .= $codeAlphabet[self::cryptoRandSecure(0, $max)];
         }
+
         return $token;
     }
 
@@ -83,6 +84,7 @@ class RememberMe
             //Discard irrelevant bits
             $rnd = $rnd & $filter;
         } while ($rnd >= $range);
+
         return $min + $rnd;
     }
 }
